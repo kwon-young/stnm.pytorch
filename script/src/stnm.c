@@ -1,31 +1,53 @@
 #include <TH/TH.h>
+#include <THC/THC.h>
 #include <stdbool.h>
 #include <stdio.h>
 
 #define real float
 
+// symbol to be automatically resolved by PyTorch libs
+extern THCState *state;
+
 int BilinearSamplerBHWD_updateOutput(THFloatTensor *inputImages, THFloatTensor *grids, THFloatTensor *output)
 {
 
-  int batchsize = inputImages->size[0];
-  int inputImages_height = inputImages->size[1];
-  int inputImages_width = inputImages->size[2];
-  int output_height = output->size[1];
-  int output_width = output->size[2];
-  int inputImages_channels = inputImages->size[3];
+  /*int batchsize = inputImages->size[0];*/
+  /*int inputImages_height = inputImages->size[1];*/
+  /*int inputImages_width = inputImages->size[2];*/
+  /*int output_height = output->size[1];*/
+  /*int output_width = output->size[2];*/
+  /*int inputImages_channels = inputImages->size[3];*/
 
-  int output_strideBatch = output->stride[0];
-  int output_strideHeight = output->stride[1];
-  int output_strideWidth = output->stride[2];
+  /*int output_strideBatch = output->stride[0];*/
+  /*int output_strideHeight = output->stride[1];*/
+  /*int output_strideWidth = output->stride[2];*/
 
-  int inputImages_strideBatch = inputImages->stride[0];
-  int inputImages_strideHeight = inputImages->stride[1];
-  int inputImages_strideWidth = inputImages->stride[2];
+  /*int inputImages_strideBatch = inputImages->stride[0];*/
+  /*int inputImages_strideHeight = inputImages->stride[1];*/
+  /*int inputImages_strideWidth = inputImages->stride[2];*/
 
-  int grids_strideBatch = grids->stride[0];
-  int grids_strideHeight = grids->stride[1];
-  int grids_strideWidth = grids->stride[2];
+  /*int grids_strideBatch = grids->stride[0];*/
+  /*int grids_strideHeight = grids->stride[1];*/
+  /*int grids_strideWidth = grids->stride[2];*/
 
+  int batchsize = THCudaTensor_size(state, inputImages, 0);
+  int inputImages_height = THCudaTensor_size(state, inputImages, 1);
+  int inputImages_width = THCudaTensor_size(state, inputImages, 2);
+  int output_height = THCudaTensor_size(state, output, 1);
+  int output_width = THCudaTensor_size(state, output, 2);
+  int inputImages_channels = THCudaTensor_size(state, inputImages, 3);
+
+  int output_strideBatch = THCudaTensor_stride(state, output, 0);
+  int output_strideHeight = THCudaTensor_stride(state, output, 1);
+  int output_strideWidth = THCudaTensor_stride(state, output, 2);
+
+  int inputImages_strideBatch = THCudaTensor_stride(state, inputImages, 0);
+  int inputImages_strideHeight = THCudaTensor_stride(state, inputImages, 1);
+  int inputImages_strideWidth = THCudaTensor_stride(state, inputImages, 2);
+
+  int grids_strideBatch = THCudaTensor_stride(state, grids, 0);
+  int grids_strideHeight = THCudaTensor_stride(state, grids, 1);
+  int grids_strideWidth = THCudaTensor_stride(state, grids, 2);
 
   real *inputImages_data, *output_data, *grids_data;
   inputImages_data = THFloatTensor_data(inputImages);
@@ -107,32 +129,32 @@ int BilinearSamplerBHWD_updateGradInput(THFloatTensor *inputImages, THFloatTenso
 {
   bool onlyGrid=false;
 
-  int batchsize = inputImages->size[0];
-  int inputImages_height = inputImages->size[1];
-  int inputImages_width = inputImages->size[2];
-  int gradOutput_height = gradOutput->size[1];
-  int gradOutput_width = gradOutput->size[2];
-  int inputImages_channels = inputImages->size[3];
+  int batchsize = THCudaTensor_size(state, inputImages, 0);
+  int inputImages_height = THCudaTensor_size(state, inputImages, 1);
+  int inputImages_width = THCudaTensor_size(state, inputImages, 2);
+  int gradOutput_height = THCudaTensor_size(state, gradOutput, 1);
+  int gradOutput_width = THCudaTensor_size(state, gradOutput, 2);
+  int inputImages_channels = THCudaTensor_size(state, inputImages, 3);
 
-  int gradOutput_strideBatch = gradOutput->stride[0];
-  int gradOutput_strideHeight = gradOutput->stride[1];
-  int gradOutput_strideWidth = gradOutput->stride[2];
+  int gradOutput_strideBatch = THCudaTensor_stride(state, gradOutput, 0);
+  int gradOutput_strideHeight = THCudaTensor_stride(state, gradOutput, 1);
+  int gradOutput_strideWidth = THCudaTensor_stride(state, gradOutput, 2);
 
-  int inputImages_strideBatch = inputImages->stride[0];
-  int inputImages_strideHeight = inputImages->stride[1];
-  int inputImages_strideWidth = inputImages->stride[2];
+  int inputImages_strideBatch = THCudaTensor_stride(state, inputImages, 0);
+  int inputImages_strideHeight = THCudaTensor_stride(state, inputImages, 1);
+  int inputImages_strideWidth = THCudaTensor_stride(state, inputImages, 2);
 
-  int gradInputImages_strideBatch = gradInputImages->stride[0];
-  int gradInputImages_strideHeight = gradInputImages->stride[1];
-  int gradInputImages_strideWidth = gradInputImages->stride[2];
+  int gradInputImages_strideBatch = THCudaTensor_stride(state, gradInputImages, 0);
+  int gradInputImages_strideHeight = THCudaTensor_stride(state, gradInputImages, 1);
+  int gradInputImages_strideWidth = THCudaTensor_stride(state, gradInputImages, 2);
 
-  int grids_strideBatch = grids->stride[0];
-  int grids_strideHeight = grids->stride[1];
-  int grids_strideWidth = grids->stride[2];
+  int grids_strideBatch = THCudaTensor_stride(state, grids, 0);
+  int grids_strideHeight = THCudaTensor_stride(state, grids, 1);
+  int grids_strideWidth = THCudaTensor_stride(state, grids, 2);
 
-  int gradGrids_strideBatch = gradGrids->stride[0];
-  int gradGrids_strideHeight = gradGrids->stride[1];
-  int gradGrids_strideWidth = gradGrids->stride[2];
+  int gradGrids_strideBatch = THCudaTensor_stride(state, gradGrids, 0);
+  int gradGrids_strideHeight = THCudaTensor_stride(state, gradGrids, 1);
+  int gradGrids_strideWidth = THCudaTensor_stride(state, gradGrids, 2);
 
   real *inputImages_data, *gradOutput_data, *grids_data, *gradGrids_data, *gradInputImages_data;
   inputImages_data = THFloatTensor_data(inputImages);
